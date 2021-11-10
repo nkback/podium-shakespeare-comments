@@ -5,8 +5,11 @@
       &nbsp;&nbsp;&nbsp;&nbsp;
       <img alt="Vue logo" src="../assets/shakespeare.jpg" style="height: 200px;">
     </div>
+    <div> 
+      <input type="text" style="width: 452px; height: 30px; border-radius: 8px; border: solid 1px gray; margin-bottom: 8px" placeholder="Search name or content of a review" v-model="search" @input="debounceInput" />
 
-    <div v-for="review in reviews" :key="review.id">
+    </div>
+    <div v-for="review in filteredReviews" :key="review.id">
       <Review :review="review" style="margin-bottom: 15px" />
     </div>
   </div>
@@ -15,13 +18,17 @@
 <script>
 import axios from 'axios';
 import Review from './Review.vue'
+import _ from 'lodash';
+
 export default {
   name: 'Home',
   components: {Review},
   data() {
     return {
       reviews: [],
-      average: 0.0
+      filteredReviews: [],
+      average: 0.0,
+      search: ''
     }
   },
   methods: {
@@ -29,6 +36,7 @@ export default {
       let res = await axios.get("https://shakespeare.podium.com/api/reviews");
       if(res.status === 200) {
         this.reviews = res.data
+        this.filteredReviews = res.data
       }
       this.calcAvg()
     },
@@ -40,7 +48,15 @@ export default {
       });
 
       this.average = (total / this.reviews.length).toFixed(2)
-    }
+    },
+    debounceInput: _.debounce(function () {
+      if(this.search === '') this.filteredReviews = this.reviews;
+      else {
+        this.filteredReviews = this.reviews.filter((item) => {
+          return item.body.toLowerCase().includes(this.search.toLowerCase()) || item.author.toLowerCase().includes(this.search.toLowerCase())
+        })
+      }
+    }, 500)
   },
   mounted() {
     axios.defaults.headers.common['x-api-key'] = 'H3TM28wjL8R4#HTnqk?c'
