@@ -5,10 +5,25 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
   name: 'Home',
+  data() {
+    return {
+      reviews: ''
+    }
+  },
+  methods: {
+    async getReviews() {
+      let data = await axios.get("https://shakespeare.podium.com/api/reviews");
+      console.log(data);
+    }
+  },
   props: {
     msg: String
+  },
+  mounted() {
+    this.getReviews()
   }
 }
 </script>
