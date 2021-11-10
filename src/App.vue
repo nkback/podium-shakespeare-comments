@@ -1,5 +1,4 @@
 <template>
-  <img alt="Vue logo" src="./assets/shakespeare.jpg" style="height: 200px; width: auto;">
   <Home />
 </template>
 
